@@ -65,6 +65,14 @@ using namespace arma;
 // #define MAX_CORE_SIZE 10000					//The max number of entries in core tensor
 // #define MAX_ITER 2000						//The maximum iteration number
 // #define MAX_COUPLEDMAT_NUM 3				//The maximum number of coupled matrices
+// /////////      Pre-defined demo debug      ///////////
+// #define MAX_ORDER 5							//The max order/way of input tensor
+// #define MAX_INPUT_DIMENSIONALITY 11000     //The max dimensionality/mode length of input tensor
+// #define MAX_CORE_TENSOR_DIMENSIONALITY 120	//The max dimensionality/mode length of core tensor
+// #define MAX_ENTRY 23000000						//The max number of entries in input tensor
+// #define MAX_CORE_SIZE 10000					//The max number of entries in core tensor
+// #define MAX_ITER 2000						//The maximum iteration number
+// #define MAX_COUPLEDMAT_NUM 5				//The maximum number of coupled matrices
 
 ///////////////////////////////////////////////// 225000000
 ////472855296
@@ -272,7 +280,11 @@ void Initialize() {	//INITIALIZE
 		}
 		printf("Elapsed Time:\t%lf\n", (clock() - Timee) / CLOCKS_PER_SEC);
 	}
+	// NOTE: what we need is not just init the factor two file, we need to load the whole factors.
+	// but the only thing that is different to factor two is that it is from speaker model while
+	// others are from the cmtf it self.
 	else {
+		printf("load factors/Cfactors/core from  :%s\n", InputPath);
 		double Timee = clock();
 		iter = 0;
 		if (nonnegativity) nonnegFlag = 1;
@@ -286,6 +298,7 @@ void Initialize() {	//INITIALIZE
 					fscanf(fin, "%lf", &facMat[iii][jjj][kkk]);
 				}
 			}
+			printf("loaded FACTOR%d \n", iii);
 		}
 
 
@@ -299,6 +312,7 @@ void Initialize() {	//INITIALIZE
 					}
 				}
 			}
+			printf("loaded CFACTOR%d \n", i);
 		}
 		sprintf(temp, "%s/CORETENSOR", InputPath);
 		FILE *fcore = fopen(temp, "r");
@@ -313,6 +327,7 @@ void Initialize() {	//INITIALIZE
 				coreWhere[j][coreIndex[i][j]].push_back(i);
 			}
 		}
+		printf("loaded CORETENSOR \n");
 		printf("Elapsed Time:\t%lf\n", (clock() - Timee) / CLOCKS_PER_SEC);
 	}
 }
@@ -976,7 +991,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	ConfigPath = argv[1];
-	TrainPath = argv[2];
+	TrainPath = argv[2]; 
 	TestPath = argv[3];
 	ResultPath = argv[4];
 	numCoupledMat = atoi(argv[5]);

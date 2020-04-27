@@ -13,7 +13,7 @@ OPT = -O2 -mcmodel=medium  -fopenmp
 
 CXXFLAGS = $(DEBUG) $(FINAL) $(OPT) $(EXTRA_OPT)
 
-all: S3CMTF-base S3CMTF-opt S3CMTF-opt-CP
+all: S3CMTF-base S3CMTF-opt S3CMTF-opt-CP S3CMTF-opt-con
 
 
 S3CMTF-base: S3CMTF-base.cpp 
@@ -23,6 +23,9 @@ S3CMTF-opt: S3CMTF-opt.cpp
 	$(CXX) $(CXXFLAGS)  -o $@  $< $(LIB_FLAGS) 
 
 S3CMTF-opt-CP: S3CMTF-opt-CP.cpp 
+	$(CXX) $(CXXFLAGS)  -o $@  $< $(LIB_FLAGS) 
+
+S3CMTF-opt-con: S3CMTF-opt-con.cpp 
 	$(CXX) $(CXXFLAGS)  -o $@  $< $(LIB_FLAGS) 
 
 

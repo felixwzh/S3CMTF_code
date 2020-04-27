@@ -300,3 +300,15 @@ not working
 ./S3CMTF-opt s3cmtf_config.txt s3cmtf_train.tensor s3cmtf_dev.tensor result_opt_15x30x20_0.0005_1_4_200 2 0.0005 1 4 200
 
 ./S3CMTF-opt s3cmtf_config.txt s3cmtf_train.tensor s3cmtf_dev.tensor result_opt_15x30x20_0.0005_1_4_200 2 0.0005 1 4 200
+
+
+
+## PCA_dim_384 S3CMTF-opt-con debug 
+./S3CMTF-opt-con s3cmtf_config_con_debug.txt s3cmtf_train.tensor s3cmtf_dev.tensor S3CMTF-opt-con-debug_2 2 0.0005 0.5 2 200 0.1 2 0 0.1 0 1 # this one is good
+
+
+## PCA_dim_384 S3CMTF-opt-con
+# s3cmtf_config_con_iter_200_15x30x20_0.0005_1_4-from-speaker speaker and TF
+./S3CMTF-opt-con s3cmtf_config_con_iter_200_15x30x20_0.0005_1_4-from-speaker.txt s3cmtf_train.tensor s3cmtf_dev.tensor con_iter_200_15x30x20_0.0005_1_4-from-speaker 2 0.0005 1 4 200 0.1 2 0 0.1 0 1
+
+./S3CMTF-opt-con s3cmtf_config_con_iter_200_15x30x20_0.0005_1_4-from-TF.txt s3cmtf_train.tensor s3cmtf_dev.tensor con_iter_200_15x30x20_0.0005_1_4-from-TF 2 0.0005 1 4 200 0.1 2 0 0.1 0 1
