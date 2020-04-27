@@ -40,12 +40,21 @@ using namespace arma;
 
 /////////      Pre-defined values      ///////////
 
+// #define MAX_ORDER 4							//The max order/way of input tensor
+// #define MAX_INPUT_DIMENSIONALITY 100000     //The max dimensionality/mode length of input tensor
+// #define MAX_CORE_TENSOR_DIMENSIONALITY 30	//The max dimensionality/mode length of core tensor
+// #define MAX_ENTRY 50000						//The max number of nonzeros in input tensor
+// #define MAX_CORE_SIZE 27000					//The max number of nonzeros in core tensor
+// #define MAX_ITER 2000						//The maximum iteration number
+
+
 #define MAX_ORDER 4							//The max order/way of input tensor
-#define MAX_INPUT_DIMENSIONALITY 100000     //The max dimensionality/mode length of input tensor
-#define MAX_CORE_TENSOR_DIMENSIONALITY 30	//The max dimensionality/mode length of core tensor
-#define MAX_ENTRY 50000						//The max number of nonzeros in input tensor
-#define MAX_CORE_SIZE 27000					//The max number of nonzeros in core tensor
+#define MAX_INPUT_DIMENSIONALITY 11000     //The max dimensionality/mode length of input tensor
+#define MAX_CORE_TENSOR_DIMENSIONALITY 120	//The max dimensionality/mode length of core tensor
+#define MAX_ENTRY 23000000						//The max number of entries in input tensor
+#define MAX_CORE_SIZE 10000					//The max number of entries in core tensor
 #define MAX_ITER 2000						//The maximum iteration number
+#define MAX_COUPLEDMAT_NUM 3				//The maximum number of coupled matrices
 
 /////////////////////////////////////////////////
 

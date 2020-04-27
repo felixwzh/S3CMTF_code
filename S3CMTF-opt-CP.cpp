@@ -18,12 +18,11 @@
 * To compile S3CMTF-opt, type following command:
 *   - make opt
 */
-// in order to get each output, we also output the factors each iterartion.
 
 /////    Header files     /////
 
 #include <stdio.h>
-#include <algorithm> 
+#include <algorithm>
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
@@ -38,29 +37,27 @@ using namespace arma;
 
 ///////////////////////////////
 
-
-// /////////      Pre-defined values 1M      ///////////
+/////////      Pre-defined values 1M      ///////////
 
 #define MAX_ORDER 4							//The max order/way of input tensor
 #define MAX_INPUT_DIMENSIONALITY 460000     //The max dimensionality/mode length of input tensor
-#define MAX_CORE_TENSOR_DIMENSIONALITY 45	//The max dimensionality/mode length of core tensor
-#define MAX_ENTRY 400000000						//The max number of entries in input tensor
+#define MAX_CORE_TENSOR_DIMENSIONALITY 30	//The max dimensionality/mode length of core tensor
+#define MAX_ENTRY 500000000						//The max number of entries in input tensor
 #define MAX_CORE_SIZE 10000					//The max number of entries in core tensor
 #define MAX_ITER 2000						//The maximum iteration number
-#define MAX_COUPLEDMAT_NUM 3	 			//The maximum number of coupled matrices
+#define MAX_COUPLEDMAT_NUM 3				//The maximum number of coupled matrices
 
 // /////////      Pre-defined values      ///////////
 
-// #define MAX_ORDER 4							//The max order/way of input tensor 
-// #define MAX_INPUT_DIMENSIONALITY 205000     //The max dimensionality/mode length of input tensor
-// #define MAX_CORE_TENSOR_DIMENSIONALITY 31	//The max dimensionality/mode length of core tensor
-// #define MAX_ENTRY 230000000						//The max number of entries in input tensor
-// #define MAX_CORE_SIZE 10000					//The max number of entries in core tensor
+// #define MAX_ORDER 5							//The max order/way of input tensor
+// #define MAX_INPUT_DIMENSIONALITY 15000     //The max dimensionality/mode length of input tensor
+// #define MAX_CORE_TENSOR_DIMENSIONALITY 30	//The max dimensionality/mode length of core tensor
+// #define MAX_ENTRY 250000						//The max number of entries in input tensor
+// #define MAX_CORE_SIZE 27000					//The max number of entries in core tensor
 // #define MAX_ITER 2000						//The maximum iteration number
-// #define MAX_COUPLEDMAT_NUM 3				//The maximum number of coupled matrices
+// #define MAX_COUPLEDMAT_NUM 10				//The maximum number of coupled matrices
 
-///////////////////////////////////////////////// 225000000
-////472855296
+/////////////////////////////////////////////////
 
 
 /////////      Variables           ///////////
@@ -210,6 +207,12 @@ void Getting_Input() {
 		}
 		fscanf(ftest, "%lf", &testEntries[i]);
 	}
+    
+    
+    
+    
+    
+    
 	printf("Elapsed Time:\t%lf\n", (clock() - Timee) / CLOCKS_PER_SEC);
 	printf("Reading Done.\nNorm : %lf\nInitialize\n", trainNorm);
 }
@@ -242,27 +245,47 @@ void Initialize() {	//INITIALIZE
 				}
 			}
 		}
+        
+        
+        
+// 		for (i = 1; i <= coreNum; i++) {
+// 			coreEntries[i] = frand(initVal / 2, initVal);
+
+// 			for (j = 1; j <= order; j++) {
+// 				coreIndex[i][j] = coreIndex[i - 1][j];
+// 			}
+// 			coreIndex[i][order]++;  k = order;
+// 			while (coreIndex[i][k] > coreSize[k]) {
+// 				coreIndex[i][k] -= coreSize[k];
+// 				coreIndex[i][k - 1]++; k--;
+// 			}
+// 			if (i == 1) {
+// 				for (j = 1; j <= order; j++) coreIndex[i][j] = 1;
+// 			}
+
+// 			for (j = 1; j <= order; j++) {
+// 				if (nanCount == 1) {
+// 					coreWhere[j][coreIndex[i][j]].push_back(i);
+// 				}
+// 			}
+// 		}
+        char* CORETENSOR_PATH= "CORETENSOR";
+		FILE *fcore = fopen(CORETENSOR_PATH, "r");
 		for (i = 1; i <= coreNum; i++) {
-			coreEntries[i] = frand(initVal / 2, initVal);
-
 			for (j = 1; j <= order; j++) {
-				coreIndex[i][j] = coreIndex[i - 1][j];
+				fscanf(fcore, "%d", &coreIndex[i][j]);
 			}
-			coreIndex[i][order]++;  k = order;
-			while (coreIndex[i][k] > coreSize[k]) {
-				coreIndex[i][k] -= coreSize[k];
-				coreIndex[i][k - 1]++; k--;
-			}
-			if (i == 1) {
-				for (j = 1; j <= order; j++) coreIndex[i][j] = 1;
-			}
-
-			for (j = 1; j <= order; j++) {
-				if (nanCount == 1) {
-					coreWhere[j][coreIndex[i][j]].push_back(i);
-				}
+			fscanf(fcore, "%lf", &coreEntries[i]);
+		}
+		for (j = 1; j <= order; j++) {
+			if (nanCount == 1) {
+				coreWhere[j][coreIndex[i][j]].push_back(i);
 			}
 		}
+
+        
+        
+        
 		printf("Elapsed Time:\t%lf\n", (clock() - Timee) / CLOCKS_PER_SEC);
 	}
 	else {
@@ -270,7 +293,7 @@ void Initialize() {	//INITIALIZE
 		iter = 0;
 		if (nonnegativity) nonnegFlag = 1;
 
-		char temp[100];
+		char temp[50];
 		for (int iii = 1; iii <= order; iii++) {
 			sprintf(temp, "%s/FACTOR%d", InputPath, iii);
 			FILE *fin = fopen(temp, "r");
@@ -293,6 +316,8 @@ void Initialize() {	//INITIALIZE
 				}
 			}
 		}
+        
+        
 		sprintf(temp, "%s/CORETENSOR", InputPath);
 		FILE *fcore = fopen(temp, "r");
 		for (i = 1; i <= coreNum; i++) {
@@ -396,40 +421,40 @@ void Update_Factor_Matrices() {
 			}
 			//Update_Core_Tensor
 
-			if (i%threadsNum == 0) {
-				int kk;
-				if (normalization == 2) {
-					for (kk = 1; kk <= coreNum; kk++) {
-						double temp2;
-						if (abss(coreEntries[kk]) < 0.00000001) {
-							coreEntries[kk] = 0.0000001;
-						}
-						temp2 = CoreProducts[kk] / coreEntries[kk];
-						coreEntries[kk] = coreEntries[kk] + learnRate*(currentVal - current_estimation)*temp2 - learnRate*lambdaReg*coreEntries[kk] / trainEntryNum;
+// 			if (i%threadsNum == 0) {
+// 				int kk;
+// 				if (normalization == 2) {
+// 					for (kk = 1; kk <= coreNum; kk++) {
+// 						double temp2;
+// 						if (abss(coreEntries[kk]) < 0.00000001) {
+// 							coreEntries[kk] = 0.0000001;
+// 						}
+// 						temp2 = CoreProducts[kk] / coreEntries[kk];
+// 						coreEntries[kk] = coreEntries[kk] + learnRate*(currentVal - current_estimation)*temp2 - learnRate*lambdaReg*coreEntries[kk] / trainEntryNum;
 
-						if (nonnegativity) {
-							if (coreEntries[kk] <= 0 && (iter>10 || nonnegFlag == 0)) {
-								coreEntries[kk] /= 2;
-							}
-						}
-					}
-				}
-				else {
-					for (kk = 1; kk <= coreNum; kk++) {
-						double temp2;
-						if (abss(coreEntries[kk]) < 0.00000001) {
-							coreEntries[kk] = 0.0000001;
-						}
-						temp2 = CoreProducts[kk] / coreEntries[kk];
-						coreEntries[kk] = coreEntries[kk] + learnRate*(currentVal - current_estimation)*temp2 - learnRate*lambdaReg*coreEntries[kk] / (trainEntryNum*abss(coreEntries[kk]));
-						if (nonnegativity) {
-							if (coreEntries[kk] <= 0 && (iter>10 || nonnegFlag == 0)) {
-								coreEntries[kk] /= 2;
-							}
-						}
-					}
-				}
-			}
+// 						if (nonnegativity) {
+// 							if (coreEntries[kk] <= 0 && (iter>10 || nonnegFlag == 0)) {
+// 								coreEntries[kk] /= 2;
+// 							}
+// 						}
+// 					}
+// 				}
+// 				else {
+// 					for (kk = 1; kk <= coreNum; kk++) {
+// 						double temp2;
+// 						if (abss(coreEntries[kk]) < 0.00000001) {
+// 							coreEntries[kk] = 0.0000001;
+// 						}
+// 						temp2 = CoreProducts[kk] / coreEntries[kk];
+// 						coreEntries[kk] = coreEntries[kk] + learnRate*(currentVal - current_estimation)*temp2 - learnRate*lambdaReg*coreEntries[kk] / (trainEntryNum*abss(coreEntries[kk]));
+// 						if (nonnegativity) {
+// 							if (coreEntries[kk] <= 0 && (iter>10 || nonnegFlag == 0)) {
+// 								coreEntries[kk] /= 2;
+// 							}
+// 						}
+// 					}
+// 				}
+// 			}
 
 		}
 		else {
@@ -660,10 +685,10 @@ void Orthogonalize() {
 
 //[Input] Factorized results: core tensor G and factor matrices U^{(n)} (n=1...N)
 //[Output] Core tensor G in sparse tensor format and factor matrices U^{(n)} (n=1...N) in full-dense matrix format
-//[Function] Writing all factor matrices and core tensor in the result path
+//[Function] Writing al l factor matrices and core tensor in the result path
 void Print() {
 	printf("\nWriting factor matrices and core tensor to file...\n");
-	char temp[100];
+	char temp[50];
 	sprintf(temp, "mkdir %s", ResultPath);
 	system(temp);
 	for (i = 1; i <= order; i++) {
@@ -700,6 +725,7 @@ void Print() {
 	}
     fclose(fcore);
 }
+
 //[Input] Input tensor and initialized core tensor and factor matrices
 //[Output] Updated core tensor and factor matrices
 //[Function] Performing main algorithm which updates core tensor and factor matrices iteratively
@@ -711,18 +737,14 @@ void CMTF() {
 	learnRate = initialLearnRate;
     
     
-    char temp[100];
+    
+
+	char temp[50];
 	sprintf(temp, "mkdir %s", ResultPath);
 	system(temp);
     sprintf(temp, "%s/results.log", ResultPath);
 
-
-//     Reconstruction();
-//     printf("Init Train Rmse : %lf\tTest Rmse : %lf\n", trainRMSE, testRMSE);
-    // get the initial error from the first iter before the training.
-    // FIXME: test this. 
-
-            
+    
     
 	while (1) {
 
@@ -742,7 +764,7 @@ void CMTF() {
         FILE *iter_results_file = fopen(temp, "a");
         fprintf(iter_results_file,"iter%d :      Train Rmse : %lf\tTest Rmse : %lf\tElapsed Time : %lf\n", iter, trainRMSE, testRMSE, omp_get_wtime() - itertime);
         fclose(iter_results_file);
-        if (iter == 12 && nonnegativity == 1 && nonnegFlag == 1) {
+		if (iter == 12 && nonnegativity == 1 && nonnegFlag == 1) {
 			iter = 1; nonnegFlag = 0;
 		}
 		learnRate = initialLearnRate / (1 + alpha*iter);//(1 + initialLearnRate * 100 * iter);
@@ -755,7 +777,7 @@ void CMTF() {
 		}
 		if (iter == iterNum) break;
         Print();
-        prevTrainRMSE = trainRMSE;
+		prevTrainRMSE = trainRMSE;
 	}
 
 	avertime /= iter;
@@ -780,7 +802,7 @@ void CMTF() {
 //[Function] Writing running time and train RMSE for each iteration in an output file
 void PrintTime() {
 	printf("\nWriting Time and error to file...\n");
-	char temp[100];
+	char temp[50];
 	sprintf(temp, "mkdir %s", ResultPath);
 	system(temp);
 	sprintf(temp, "%s/TIMEERROR", ResultPath);
