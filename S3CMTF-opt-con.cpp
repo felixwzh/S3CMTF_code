@@ -22,7 +22,7 @@
 
 /*
 zhenghui: this file is used for train S3CMTF from some initial point.
-TODO: 1. read and load FACTORSx file
+
 
 
 */
@@ -48,13 +48,13 @@ using namespace arma;
 
 // /////////      Pre-defined values 1M      ///////////
 
-#define MAX_ORDER 4							//The max order/way of input tensor
-#define MAX_INPUT_DIMENSIONALITY 460000     //The max dimensionality/mode length of input tensor
-#define MAX_CORE_TENSOR_DIMENSIONALITY 45	//The max dimensionality/mode length of core tensor
-#define MAX_ENTRY 400000000						//The max number of entries in input tensor
-#define MAX_CORE_SIZE 10000					//The max number of entries in core tensor
-#define MAX_ITER 2000						//The maximum iteration number
-#define MAX_COUPLEDMAT_NUM 3	 			//The maximum number of coupled matrices
+// #define MAX_ORDER 4							//The max order/way of input tensor
+// #define MAX_INPUT_DIMENSIONALITY 460000     //The max dimensionality/mode length of input tensor
+// #define MAX_CORE_TENSOR_DIMENSIONALITY 45	//The max dimensionality/mode length of core tensor
+// #define MAX_ENTRY 400000000						//The max number of entries in input tensor
+// #define MAX_CORE_SIZE 10000					//The max number of entries in core tensor
+// #define MAX_ITER 2000						//The maximum iteration number
+// #define MAX_COUPLEDMAT_NUM 3	 			//The maximum number of coupled matrices
 
 // /////////      Pre-defined values      ///////////
 
@@ -66,13 +66,13 @@ using namespace arma;
 // #define MAX_ITER 2000						//The maximum iteration number
 // #define MAX_COUPLEDMAT_NUM 3				//The maximum number of coupled matrices
 // /////////      Pre-defined demo debug      ///////////
-// #define MAX_ORDER 5							//The max order/way of input tensor
-// #define MAX_INPUT_DIMENSIONALITY 11000     //The max dimensionality/mode length of input tensor
-// #define MAX_CORE_TENSOR_DIMENSIONALITY 120	//The max dimensionality/mode length of core tensor
-// #define MAX_ENTRY 23000000						//The max number of entries in input tensor
-// #define MAX_CORE_SIZE 10000					//The max number of entries in core tensor
-// #define MAX_ITER 2000						//The maximum iteration number
-// #define MAX_COUPLEDMAT_NUM 5				//The maximum number of coupled matrices
+#define MAX_ORDER 5							//The max order/way of input tensor
+#define MAX_INPUT_DIMENSIONALITY 11000     //The max dimensionality/mode length of input tensor
+#define MAX_CORE_TENSOR_DIMENSIONALITY 120	//The max dimensionality/mode length of core tensor
+#define MAX_ENTRY 23000000						//The max number of entries in input tensor
+#define MAX_CORE_SIZE 10000					//The max number of entries in core tensor
+#define MAX_ITER 2000						//The maximum iteration number
+#define MAX_COUPLEDMAT_NUM 5				//The maximum number of coupled matrices
 
 ///////////////////////////////////////////////// 225000000
 ////472855296
@@ -108,6 +108,12 @@ int Mul[MAX_ORDER], tempPermu[MAX_ORDER], rowcount;
 double timeHistory[MAX_ITER], trainRmseHistory[MAX_ITER], testRmseHistory[MAX_ITER];
 int normalization;
 int nonnegativity, nonnegFlag, orthogonality, isInputPath;
+/*
+isInputPath: 
+0: will not use the InputhPath for init
+1: init all the FACTOR/CFACTOR/CORETENSOR from files in InputhPath
+2: onlyt init FACTOR2 from InputhPath, while other FACTORx/CFACTOR/CORETENSOR are initialized randomly.
+*/
 double alpha;
 int iter = 0;
 
@@ -172,7 +178,7 @@ void Getting_Input() {
 		totalN += coupleEntryNum[i];
 	}
 
-	if (isInputPath) {
+	if (isInputPath!=0) {
 		fscanf(config, "%s", &InputPath);
 	}
 
@@ -283,7 +289,9 @@ void Initialize() {	//INITIALIZE
 	// NOTE: what we need is not just init the factor two file, we need to load the whole factors.
 	// but the only thing that is different to factor two is that it is from speaker model while
 	// others are from the cmtf it self.
-	else {
+	
+	else if (isInputPath == 1) {
+		// In this condition, we init all the FACTOR/CFACTOR/CORETENSOR from files in InputhPath
 		printf("load factors/Cfactors/core from  :%s\n", InputPath);
 		double Timee = clock();
 		iter = 0;
@@ -329,6 +337,69 @@ void Initialize() {	//INITIALIZE
 		}
 		printf("loaded CORETENSOR \n");
 		printf("Elapsed Time:\t%lf\n", (clock() - Timee) / CLOCKS_PER_SEC);
+	}
+	else if (isInputPath == 2) {
+		// In this condition, we onlyt init FACTOR2 from InputhPath, 
+		// while other FACTORx/CFACTOR/CORETENSOR are initialized randomly.
+		double Timee = clock();
+		iter = 0;
+		double initVal = pow((maxv / coreNum), (1 / double(order + 1)));
+		if (nonnegativity) nonnegFlag = 1;
+
+		for (i = 1; i <= numCoupledMat; i++) {
+			if (!isGraph[i]) {
+				int cplDim = coupleDim[i];
+				double cinitVal = cmaxv / (coreSize[cplDim] * initVal);
+				for (j = 1; j <= coupleDimensionality[i]; j++) {
+					for (k = 1; k <= coreSize[cplDim]; k++) {
+						coupleFacMat[i][j][k] = frand(cinitVal, cinitVal * 2);
+					}
+				}
+			}
+		}
+		for (i = 1; i <= order; i++) {
+			for (j = 1; j <= dimensionality[i]; j++) {
+				for (k = 1; k <= coreSize[i]; k++) {
+					facMat[i][j][k] = frand(initVal / 2, initVal);
+				}
+			}
+		}
+
+		// init FACTOR2
+		char temp[100];
+		sprintf(temp, "%s/FACTOR2", InputPath);
+		FILE *fin = fopen(temp, "r");
+		for (int jjj = 1; jjj <= dimensionality[2]; jjj++) {
+			for (int kkk = 1; kkk <= coreSize[2]; kkk++) {
+				fscanf(fin, "%lf", &facMat[2][jjj][kkk]);
+			}
+		}
+		printf("loaded FACTOR2 \n");
+		
+		for (i = 1; i <= coreNum; i++) {
+			coreEntries[i] = frand(initVal / 2, initVal);
+
+			for (j = 1; j <= order; j++) {
+				coreIndex[i][j] = coreIndex[i - 1][j];
+			}
+			coreIndex[i][order]++;  k = order;
+			while (coreIndex[i][k] > coreSize[k]) {
+				coreIndex[i][k] -= coreSize[k];
+				coreIndex[i][k - 1]++; k--;
+			}
+			if (i == 1) {
+				for (j = 1; j <= order; j++) coreIndex[i][j] = 1;
+			}
+
+			for (j = 1; j <= order; j++) {
+				if (nanCount == 1) {
+					coreWhere[j][coreIndex[i][j]].push_back(i);
+				}
+			}
+		}
+		printf("Elapsed Time:\t%lf\n", (clock() - Timee) / CLOCKS_PER_SEC);
+
+
 	}
 }
 

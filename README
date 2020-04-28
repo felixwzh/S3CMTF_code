@@ -73,7 +73,7 @@
 		[Line 6]  Number of entries of test data tensor
 		[Next lines repeated for the number of coupled matrices]
 			[Line 6+i]  'Coupled mode' 'Path of i-th coupled matrix' 'Dimensionality of i-th coupled dimension' 'Number of entries of i-th coupled matrix'
-			
+		[Line 7*] InputPath. the path of the input FACTOR/CFACTOR/CORETENSOR files for initialization.
 		
 		After editing configuration file, all pre-defined values in source files (S3CMTF-base.cpp, S3CMTF-opt.cpp) must be adjusted.
 		The details of pre-defined values are as follows.
