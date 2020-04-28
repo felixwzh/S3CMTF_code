@@ -226,7 +226,7 @@ void Getting_Input() {
 		fscanf(ftest, "%lf", &testEntries[i]);
 	}
 	printf("Elapsed Time:\t%lf\n", (clock() - Timee) / CLOCKS_PER_SEC);
-	printf("Reading Done.\nNorm : %lf\nInitialize\n", trainNorm);
+	printf("Reading Done.\nNorm : %.20lf\nInitialize\n", trainNorm);
 }
 
 //[Input] Size of the input tensor and core tensor size
@@ -693,7 +693,7 @@ void Print() {
 		FILE *fin = fopen(temp, "w");
 		for (j = 1; j <= dimensionality[i]; j++) {
 			for (k = 1; k <= coreSize[i]; k++) {
-				fprintf(fin, "%f\t", facMat[i][j][k]);
+				fprintf(fin, "%.20lf\t", facMat[i][j][k]);
 			}
 			fprintf(fin, "\n");
 		}
@@ -705,7 +705,7 @@ void Print() {
 			FILE *fcin = fopen(temp, "w");
 			for (j = 1; j <= coupleDimensionality[i]; j++) {
 				for (k = 1; k <= coreSize[coupleDim[i]]; k++) {
-					fprintf(fcin, "%f\t", coupleFacMat[i][j][k]);
+					fprintf(fcin, "%.20lf\t", coupleFacMat[i][j][k]);
 				}
 				fprintf(fcin, "\n");
 			}
@@ -718,7 +718,7 @@ void Print() {
 		for (j = 1; j <= order; j++) {
 			fprintf(fcore, "%d\t", coreIndex[i][j]);
 		}
-		fprintf(fcore, "%f\n", coreEntries[i]);
+		fprintf(fcore, "%.20lf\n", coreEntries[i]);
 	}
     fclose(fcore);
 }
