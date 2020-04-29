@@ -61,6 +61,14 @@ using namespace arma;
 
 ///////////////////////////////////////////////// 225000000
 ////472855296
+// /////////      Pre-defined demo debug      ///////////
+// #define MAX_ORDER 5							//The max order/way of input tensor
+// #define MAX_INPUT_DIMENSIONALITY 11000     //The max dimensionality/mode length of input tensor
+// #define MAX_CORE_TENSOR_DIMENSIONALITY 120	//The max dimensionality/mode length of core tensor
+// #define MAX_ENTRY 23000000						//The max number of entries in input tensor
+// #define MAX_CORE_SIZE 10000					//The max number of entries in core tensor
+// #define MAX_ITER 2000						//The maximum iteration number
+// #define MAX_COUPLEDMAT_NUM 5				//The maximum number of coupled matrices
 
 
 /////////      Variables           ///////////
@@ -671,7 +679,7 @@ void Print() {
 		FILE *fin = fopen(temp, "w");
 		for (j = 1; j <= dimensionality[i]; j++) {
 			for (k = 1; k <= coreSize[i]; k++) {
-				fprintf(fin, "%f\t", facMat[i][j][k]);
+				fprintf(fin, "%.20lf\t", facMat[i][j][k]);
 			}
 			fprintf(fin, "\n");
 		}
@@ -683,7 +691,7 @@ void Print() {
 			FILE *fcin = fopen(temp, "w");
 			for (j = 1; j <= coupleDimensionality[i]; j++) {
 				for (k = 1; k <= coreSize[coupleDim[i]]; k++) {
-					fprintf(fcin, "%f\t", coupleFacMat[i][j][k]);
+					fprintf(fcin, "%.20lf\t", coupleFacMat[i][j][k]);
 				}
 				fprintf(fcin, "\n");
 			}
@@ -696,7 +704,7 @@ void Print() {
 		for (j = 1; j <= order; j++) {
 			fprintf(fcore, "%d\t", coreIndex[i][j]);
 		}
-		fprintf(fcore, "%f\n", coreEntries[i]);
+		fprintf(fcore, "%.20lf\n", coreEntries[i]);
 	}
     fclose(fcore);
 }

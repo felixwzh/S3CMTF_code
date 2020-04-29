@@ -48,13 +48,13 @@ using namespace arma;
 
 // /////////      Pre-defined values 1M      ///////////
 
-// #define MAX_ORDER 4							//The max order/way of input tensor
-// #define MAX_INPUT_DIMENSIONALITY 460000     //The max dimensionality/mode length of input tensor
-// #define MAX_CORE_TENSOR_DIMENSIONALITY 45	//The max dimensionality/mode length of core tensor
-// #define MAX_ENTRY 400000000						//The max number of entries in input tensor
-// #define MAX_CORE_SIZE 10000					//The max number of entries in core tensor
-// #define MAX_ITER 2000						//The maximum iteration number
-// #define MAX_COUPLEDMAT_NUM 3	 			//The maximum number of coupled matrices
+#define MAX_ORDER 4							//The max order/way of input tensor
+#define MAX_INPUT_DIMENSIONALITY 460000     //The max dimensionality/mode length of input tensor
+#define MAX_CORE_TENSOR_DIMENSIONALITY 45	//The max dimensionality/mode length of core tensor
+#define MAX_ENTRY 400000000						//The max number of entries in input tensor
+#define MAX_CORE_SIZE 10000					//The max number of entries in core tensor
+#define MAX_ITER 2000						//The maximum iteration number 
+#define MAX_COUPLEDMAT_NUM 3	 			//The maximum number of coupled matrices
 
 // /////////      Pre-defined values      ///////////
 
@@ -66,13 +66,13 @@ using namespace arma;
 // #define MAX_ITER 2000						//The maximum iteration number
 // #define MAX_COUPLEDMAT_NUM 3				//The maximum number of coupled matrices
 // /////////      Pre-defined demo debug      ///////////
-#define MAX_ORDER 5							//The max order/way of input tensor
-#define MAX_INPUT_DIMENSIONALITY 11000     //The max dimensionality/mode length of input tensor
-#define MAX_CORE_TENSOR_DIMENSIONALITY 120	//The max dimensionality/mode length of core tensor
-#define MAX_ENTRY 23000000						//The max number of entries in input tensor
-#define MAX_CORE_SIZE 10000					//The max number of entries in core tensor
-#define MAX_ITER 2000						//The maximum iteration number
-#define MAX_COUPLEDMAT_NUM 5				//The maximum number of coupled matrices
+// #define MAX_ORDER 5							//The max order/way of input tensor
+// #define MAX_INPUT_DIMENSIONALITY 11000     //The max dimensionality/mode length of input tensor
+// #define MAX_CORE_TENSOR_DIMENSIONALITY 120	//The max dimensionality/mode length of core tensor
+// #define MAX_ENTRY 23000000						//The max number of entries in input tensor
+// #define MAX_CORE_SIZE 10000					//The max number of entries in core tensor
+// #define MAX_ITER 2000						//The maximum iteration number
+// #define MAX_COUPLEDMAT_NUM 5				//The maximum number of coupled matrices
 
 ///////////////////////////////////////////////// 225000000
 ////472855296
@@ -124,7 +124,8 @@ char* TrainPath;
 char* TestPath;
 char CoupledPath[MAX_ORDER][100];
 char* ResultPath;
-char InputPath[100];
+// char InputPath[100];
+char* InputPath;
 
 /////////////////////////////////////////////////
 
@@ -178,9 +179,9 @@ void Getting_Input() {
 		totalN += coupleEntryNum[i];
 	}
 
-	if (isInputPath!=0) {
-		fscanf(config, "%s", &InputPath);
-	}
+	// if (isInputPath!=0) {
+	// 	fscanf(config, "%s", &InputPath);
+	// }
 
 	entryNumCum[numCoupledMat + 1] = totalN;
 
@@ -1062,7 +1063,10 @@ int main(int argc, char* argv[]) {
 	}
 
 	ConfigPath = argv[1];
-	TrainPath = argv[2]; 
+	// TrainPath = argv[2]; 
+	TrainPath = "s3cmtf_train.tensor";
+	printf("train tensor %s",TrainPath);
+	InputPath = argv[2];
 	TestPath = argv[3];
 	ResultPath = argv[4];
 	numCoupledMat = atoi(argv[5]);
