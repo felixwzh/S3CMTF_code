@@ -42,10 +42,10 @@ using namespace arma;
 // /////////      Pre-defined values 1M      ///////////
 
 #define MAX_ORDER 4							//The max order/way of input tensor
-#define MAX_INPUT_DIMENSIONALITY 460000     //The max dimensionality/mode length of input tensor
+#define MAX_INPUT_DIMENSIONALITY 40000     //The max dimensionality/mode length of input tensor
 #define MAX_CORE_TENSOR_DIMENSIONALITY 45	//The max dimensionality/mode length of core tensor
-#define MAX_ENTRY 400000000						//The max number of entries in input tensor
-#define MAX_CORE_SIZE 10000					//The max number of entries in core tensor
+#define MAX_ENTRY 500000000						//The max number of entries in input tensor 400000000 is ok
+#define MAX_CORE_SIZE 30000					//The max number of entries in core tensor
 #define MAX_ITER 2000						//The maximum iteration number
 #define MAX_COUPLEDMAT_NUM 3	 			//The maximum number of coupled matrices
 
@@ -975,6 +975,7 @@ int main(int argc, char* argv[]) {
 		printf("please input proper arguments\n");
 		return 0;
 	}
+	printf("read args\n");
 
 	ConfigPath = argv[1];
 	TrainPath = argv[2];
@@ -985,7 +986,7 @@ int main(int argc, char* argv[]) {
 	srand((unsigned)time(NULL));
 
 	sTime = clock();
-
+	printf("start read input\n");
 	Getting_Input();
 
 	do {
